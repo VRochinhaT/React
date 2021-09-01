@@ -8,7 +8,13 @@ function ListaDeNotas(props) {
       {props.notas.map((nota, index) => {
         return (
           <li key={index} className='lista-notas_item'>
-            <CardNota titulo={nota.titulo} texto={nota.texto} />
+            <CardNota
+              index={index}
+              titulo={nota.titulo}
+              texto={nota.texto}
+              categoria={nota.categoria}
+              deletarNota={props.deletarNota}
+            />
           </li>
         );
       })}
