@@ -1,32 +1,52 @@
-import { Typography } from '@material-ui/core';
-import React, { useState } from 'react';
+import { Step, StepLabel, Stepper, Typography } from '@material-ui/core';
+import React, { useState, useEffect } from 'react';
 import DadosEntrega from './DadosEntrega';
 import DadosPessoais from './DadosPessoais';
 import DadosUsuario from './DadosUsuario';
 
-function FormularioDeCadastro({ aoEnviarForm, validarCPF }) {
+function FormularioDeCadastro({ aoEnviarForm, validacoes }) {
   const [etapaAtual, setEtapaAtual] = useState(0);
+  const [dadosColetados, setDados] = useState({});
 
-  function proximoEtapa() {
+  useEffect(() => {
+    if (etapaAtual === formularios.length - 1) aoEnviarForm(dadosColetados);
+  });
+
+  function coletarDados(dados) {
+    setDados({ ...dadosColetados, ...dados });
+    proximaEtapa();
+  }
+
+  function proximaEtapa() {
     setEtapaAtual(etapaAtual + 1);
   }
 
-  function formularioAtual(etapa) {
-    switch (etapa) {
-      case 0:
-        return <DadosUsuario aoEnviar={proximoEtapa} />;
-      case 1:
-        return (
-          <DadosPessoais aoEnviar={proximoEtapa} validarCPF={validarCPF} />
-        );
-      case 2:
-        return <DadosEntrega aoEnviarForm={aoEnviarForm} />;
-      default:
-        return <Typography>Erro ao selecionar formulário</Typography>;
-    }
-  }
+  const formularios = [
+    <DadosUsuario aoEnviar={coletarDados} />,
+    <DadosPessoais aoEnviar={coletarDados} />,
+    <DadosEntrega aoEnviar={coletarDados} />,
+    <Typography variant='h5'>Obrigado pelo cadastro</Typography>,
+  ];
 
-  return <>{formularioAtual(etapaAtual)}</>;
+  return (
+    <>
+      <Stepper activeStep={etapaAtual}>
+        <Step>
+          <StepLabel>Login</StepLabel>
+        </Step>
+        <Step>
+          <StepLabel>Pessoal</StepLabel>
+        </Step>
+        <Step>
+          <StepLabel>Endereço</StepLabel>
+        </Step>
+        <Step>
+          <StepLabel>Finalização </StepLabel>
+        </Step>
+      </Stepper>
+      {formularios[etapaAtual]}
+    </>
+  );
 }
 
 export default FormularioDeCadastro;

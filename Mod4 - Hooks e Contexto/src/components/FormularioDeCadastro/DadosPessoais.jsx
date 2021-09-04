@@ -1,25 +1,30 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Button, TextField, Switch, FormControlLabel } from '@material-ui/core';
+import ValidacoesCadastro from '../../context/ValidacoesCadastro';
+import useErros from '../../hook/useErros';
 
-function DadosPessoais({ aoEnviar, validarCPF }) {
+function DadosPessoais({ aoEnviar }) {
   const [nome, setNome] = useState('');
   const [sobrenome, setSobrenome] = useState('');
   const [cpf, setCpf] = useState('');
   const [promocoes, setPromocoes] = useState(true);
   const [novidades, setNovidades] = useState(true);
+  const validacoes = useContext(ValidacoesCadastro);
 
-  const [erros, setErros] = useState({ cpf: { valido: true, texto: '' } });
+  const [erros, validarCampos, possoEnviar] = useErros(validacoes);
 
   return (
     <form
       onSubmit={(event) => {
         event.preventDefault();
-        aoEnviar();
+        if (possoEnviar())
+          aoEnviar({ nome, sobrenome, cpf, promocoes, novidades });
       }}
     >
       <TextField
         id='nome'
         label='Nome'
+        name='nome'
         required
         variant='outlined'
         fullWidth
@@ -33,6 +38,7 @@ function DadosPessoais({ aoEnviar, validarCPF }) {
       <TextField
         id='sobrenome'
         label='Sobrenome'
+        name='sobrenome'
         required
         variant='outlined'
         fullWidth
@@ -46,19 +52,14 @@ function DadosPessoais({ aoEnviar, validarCPF }) {
       <TextField
         id='cpf'
         label='CPF'
+        name='cpf'
         required
         variant='outlined'
         fullWidth
         margin='normal'
         error={!erros.cpf.valido}
         helperText={erros.cpf.texto}
-        onBlur={(event) => {
-          const valido = validarCPF(cpf);
-          console.log(valido);
-          setErros({
-            cpf: valido,
-          });
-        }}
+        onBlur={validarCampos}
         value={cpf}
         onChange={(event) => {
           setCpf(event.target.value);
@@ -93,7 +94,7 @@ function DadosPessoais({ aoEnviar, validarCPF }) {
         }
       />
       <Button type='submit' variant='contained' color='primary' fullWidth>
-        Cadastrar
+        Próximo
       </Button>
     </form>
   );
